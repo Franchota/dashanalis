@@ -6,7 +6,25 @@ import plotly.express as px
 import plotly.graph_objs as go
 from dash.dependencies import Input, Output
 
-df = pd.read_csv("delitos_completo.csv")
+df_2016 = pd.read_csv('http://cdn.buenosaires.gob.ar/datosabiertos/datasets/mapa-del-delito/delitos_2016.csv',parse_dates=['fecha'])
+df_2017 = pd.read_csv('http://cdn.buenosaires.gob.ar/datosabiertos/datasets/mapa-del-delito/delitos_2017.csv',parse_dates=['fecha'])
+df_2018 = pd.read_csv('http://cdn.buenosaires.gob.ar/datosabiertos/datasets/mapa-del-delito/delitos_2018.csv',parse_dates=['fecha'])
+df_2019 = pd.read_csv('http://cdn.buenosaires.gob.ar/datosabiertos/datasets/mapa-del-delito/delitos_2019.csv',parse_dates=['fecha'])
+print(df_2016.shape)
+print(df_2017.shape)
+print(df_2018.shape)
+print(df_2019.shape)
+df = pd.concat([df_2016,df_2017,df_2018,df_2019],axis=0)
+print(df.shape)
+df = df[df.barrio.isna()== False].copy()
+df.isna().sum()
+df =df.drop('subtipo_delito',axis = 1)
+df['dia_semana_num'] = df.fecha.dt.dayofweek
+df['mes_num'] = df.fecha.dt.strftime('%m')
+df['ano'] = df.fecha.dt.strftime('%Y')
+df['semana'] = df.fecha.dt.week.astype('int')
+df['ano_mes'] = df.fecha.dt.strftime('%Y-%m')
+df['dia_ano_num'] =df.fecha.dt.dayofyear
 
 dfdummies = pd.get_dummies(df['tipo_delito'])
 df = pd.concat([df, dfdummies], axis=1)
